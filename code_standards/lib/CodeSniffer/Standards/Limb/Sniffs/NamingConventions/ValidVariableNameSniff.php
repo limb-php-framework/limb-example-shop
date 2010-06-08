@@ -152,21 +152,12 @@ class Limb_Sniffs_NamingConventions_ValidVariableNameSniff extends PHP_CodeSniff
 
         $varName     = ltrim($tokens[$stackPtr]['content'], '$');
         $memberProps = $phpcsFile->getMemberProperties($stackPtr);
-        $public      = ($memberProps['scope'] === 'public');
+        $private      = ($memberProps['scope'] === 'private');
 
-        if ($public === true) {
-            if (substr($varName, 0, 1) === '_') {
-                $error = "Public member variable \"$varName\" must not contain a leading underscore";
-                $phpcsFile->addError($error, $stackPtr);
-                return;
-            }
-        } else {
-            if (substr($varName, 0, 1) !== '_') {
-                $scope = ucfirst($memberProps['scope']);
-                $error = "$scope member variable \"$varName\" must contain a leading underscore";
-                $phpcsFile->addWarning($error, $stackPtr);
-                return;
-            }
+        if ($private === true) {
+            $error = "Private member variables are prohibited, change scope of variable \"$varName\" to protected";
+            $phpcsFile->addError($error, $stackPtr);
+            return;
         }
 
         if (false === self::isUnderScores($varName)) {
