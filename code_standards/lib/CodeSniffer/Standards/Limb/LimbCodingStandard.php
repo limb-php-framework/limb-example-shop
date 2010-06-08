@@ -53,7 +53,6 @@ class PHP_CodeSniffer_Standards_Limb_LimbCodingStandard extends PHP_CodeSniffer_
                 'PEAR/Sniffs/Functions/FunctionCallArgumentSpacingSniff.php',
                 'PEAR/Sniffs/Functions/FunctionCallSignatureSniff.php',
                 'PEAR/Sniffs/Functions/ValidDefaultValueSniff.php',
-                'Squiz/Sniffs/Functions/GlobalFunctionSniff.php',
 
                 'Generic/Sniffs/CodeAnalysis/UnusedFunctionParameterSniff.php',
                 'Generic/Sniffs/CodeAnalysis/JumbledIncrementerSniff.php',
