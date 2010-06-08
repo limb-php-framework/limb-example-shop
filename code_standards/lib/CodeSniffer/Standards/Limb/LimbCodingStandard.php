@@ -46,13 +46,6 @@ class PHP_CodeSniffer_Standards_Limb_LimbCodingStandard extends PHP_CodeSniffer_
 
                 'PEAR/Sniffs/Classes/ClassDeclarationSniff.php',
 
-                'Limb/Sniffs/ControlStructures/ControlSignatureSniff.php',
-
-                'Limb/Sniffs/Files/LineLengthSniff.php',
-                'Limb/Sniffs/Files/ClosingTagSniff.php',
-
-                'Limb/Sniffs/PHP/LowerCaseConstantSniff.php',
-
                 'Generic/Sniffs/WhiteSpace/DisallowTabIndentSniff.php',
                 'PEAR/Sniffs/WhiteSpace/ScopeClosingBraceSniff.php',
 
