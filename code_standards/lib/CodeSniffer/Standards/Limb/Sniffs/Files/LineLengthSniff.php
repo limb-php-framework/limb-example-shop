@@ -39,9 +39,10 @@ class Limb_Sniffs_Files_LineLengthSniff extends Generic_Sniffs_Files_LineLengthS
     /**
      * The limit that the length of a line should not exceed.
      *
+     * We don't need it here
      * @var int
      */
-    protected $lineLimit = 100;
+    protected $lineLimit = 10000;
 
     /**
      * The limit that the length of a line must not exceed.
