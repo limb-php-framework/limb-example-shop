@@ -222,7 +222,7 @@ class Limb_Sniffs_NamingConventions_ValidVariableNameSniff extends PHP_CodeSniff
                     }
                 }
 
-                if (PHP_CodeSniffer::isCamelCaps($varName, false, true, false) === false) {
+                if (self::isUnderscores($varName, false, true, false) === false) {
                     $varName = $matches[0];
                     $error   = "Variable \"$originalVarName\" is not in valid camel caps format";
                     $phpcsFile->addError($error, $stackPtr);
