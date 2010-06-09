@@ -60,6 +60,9 @@ class PHP_CodeSniffer_Standards_Limb_LimbCodingStandard extends PHP_CodeSniffer_
 
                 'Generic/Sniffs/Metrics/CyclomaticComplexitySniff.php',
                 'Generic/Sniffs/Metrics/NestingLevelSniff.php',
+
+                'Generic/Sniffs/PHP/LowerCaseConstantSniff.php',
+
                );
 
     }//end getIncludedSniffs()
