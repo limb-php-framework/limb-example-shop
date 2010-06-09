@@ -42,7 +42,9 @@ class PHP_CodeSniffer_Standards_Limb_LimbCodingStandard extends PHP_CodeSniffer_
     public function getIncludedSniffs()
     {
         return array(
-                'Generic/Sniffs/PHP/DisallowShortOpenTagSniff.php',
+                'Generic/Sniffs/Files/LineEndingsSniff.php',
+
+                'Generic/Sniffs/Formatting/SpaceAfterCastSniff.php',
 
                 'PEAR/Sniffs/Classes/ClassDeclarationSniff.php',
 
@@ -59,8 +61,12 @@ class PHP_CodeSniffer_Standards_Limb_LimbCodingStandard extends PHP_CodeSniffer_
 
                 'Generic/Sniffs/Metrics/NestingLevelSniff.php',
 
-                'Generic/Sniffs/PHP/LowerCaseConstantSniff.php',
+                'Generic/Sniffs/NamingConventions/ConstructorNameSniff.php',
+                'Generic/Sniffs/NamingConventions/UpperCaseConstantNameSniff.php',
 
+                'Generic/Sniffs/PHP/DisallowShortOpenTagSniff.php',
+                'Generic/Sniffs/PHP/ForbiddenFunctionsSniff.php',
+                'Generic/Sniffs/PHP/LowerCaseConstantSniff.php',
                );
 
     }//end getIncludedSniffs()
