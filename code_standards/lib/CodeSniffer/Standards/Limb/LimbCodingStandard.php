@@ -58,7 +58,6 @@ class PHP_CodeSniffer_Standards_Limb_LimbCodingStandard extends PHP_CodeSniffer_
                 'Generic/Sniffs/CodeAnalysis/JumbledIncrementerSniff.php',
                 'Generic/Sniffs/CodeAnalysis/UselessOverridingMethodSniff.php',
 
-                'Generic/Sniffs/Metrics/CyclomaticComplexitySniff.php',
                 'Generic/Sniffs/Metrics/NestingLevelSniff.php',
 
                 'Generic/Sniffs/PHP/LowerCaseConstantSniff.php',
