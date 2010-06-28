@@ -1,0 +1,3 @@
+<?php
+@define('MACRO_HTTP_BASE_PATH', "http://macro.oak.bit/");
+?>
