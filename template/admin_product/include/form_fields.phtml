@@ -1,0 +1,31 @@
+{{include file='_admin/form_errors.phtml'/}}
+
+<dl class="required field">
+  <dt><label for="title">Название:</label></dt>
+  <dd>{{input name='title' type='text' title='Название'/}}</dd>
+</dl>
+
+<dl class="required field">
+  <dt><label for="price">Цена:</label></dt>
+  <dd>{{input name='price' type='text' title='Цена'/}}</dd>
+</dl>
+
+<dl class="field">
+  <dt><label for="is_available">Наличие:</label>
+  <dd>{{js_checkbox name='is_available'/}}</dd>
+</dl>
+
+<dl class="required field">
+  <dt><label for="description">Описание:</label>
+  <dd>{{textarea name='description' title='Описание'/}}</dd>
+</dl>
+
+<dl class="field">
+  <dt><label for="image">Изображение:</label>
+  <dd>
+  {{input name="image" type="file"/}}
+  <img src='{$#item.image_path}' class='img' />
+  </dd>
+</dl>
+
+{{include file='_admin/form_buttons.phtml'/}}

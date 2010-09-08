@@ -1,41 +1,19 @@
 <?php
-lmb_require('src/model/Product.class.php');
+lmb_require('limb/cms/src/controller/lmbAdminObjectController.class.php');
+lmb_require('limb/util/system/lmbFs.class.php');
 
-class AdminProductController extends lmbController
+class AdminProductController extends lmbAdminObjectController
 {
-  function doCreate()
+  protected $_object_class_name = 'Product';
+
+  protected function _onAfterImport()
   {
-    $this->_performCreateOrEdit();
+  	return $this->_uploadImage($this->item, $this->request->get('image'));
   }
 
-  function doEdit()
+  protected function _uploadImage($item, $uploaded_image)
   {
-    $this->_performCreateOrEdit();
-  }
-
-  protected function _performCreateOrEdit()
-  {
-    if(!$id = (int)$this->request->getInteger('id'))
-      $id = null;
-
-    $item = new Product($id);
-    $this->useForm('product_form');
-    $this->setFormDatasource($item);
-    $this->product = $item;
-
-    if($this->request->hasPost())
-    {
-      $item->import($this->request);
-      $this->_uploadImage($item);
-
-      if($item->trySave($this->error_list))
-        $this->redirect();
-    }
-  }
-
-  function _uploadImage($item)
-  {
-    if(!$uploaded_image = $this->request->get('image'))
+    if(!$uploaded_image)
       return;
 
     if(!$uploaded_image['name'] || !$uploaded_image['tmp_name'])
@@ -44,9 +22,7 @@ class AdminProductController extends lmbController
     $file_name = $uploaded_image['name'];
     $file_path = $uploaded_image['tmp_name'];
 
-    lmb_require('limb/util/system/lmbFs.class.php');
-
-    $dest_path = PRODUCT_IMAGES_DIR . $file_name;
+    $dest_path = lmb_env_get('PRODUCT_IMAGES_DIR') . $file_name;
     lmbFs :: cp($file_path, $dest_path);
 
     unlink($file_path);
@@ -54,33 +30,31 @@ class AdminProductController extends lmbController
     $item->setImageName($file_name);
   }
 
-  function doDelete()
+  function doSetAvailable()
   {
-    $item = new Product($this->request->getInteger('id'));
-    $item->destroy();
-    $this->redirect();
+  	return $this->_changeAvailability(true);
   }
 
-  function doChangeAvailability()
+  function doSetUnavailable()
   {
-    if(!$ids = $this->request->getArray('ids'))
+  	return $this->_changeAvailability(false);
+  }
+
+  protected function _changeAvailability($is_available)
+  {
+  	if(!$ids = $this->request->getArray('ids'))
     {
-      $this->redirect();
+      $this->_endDialog();
       return;
     }
-
-    $available = false;
-    if($this->request->get('set_available'))
-      $available = true;
 
     $products = lmbActiveRecord :: findByIds('Product', $ids);
     foreach($products as $product)
     {
-      $product->setIsAvailable($available);
+      $product->setIsAvailable((int) $is_available);
       $product->save();
     }
 
-    $this->redirect();
+    $this->_endDialog();
   }
 }
-?>

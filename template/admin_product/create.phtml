@@ -1,13 +1,8 @@
-<? $this->title = 'Create new product'; ?>
-{{wrap with="admin_page_layout.phtml" in="content_zone"}}
-
-{{form id='product_form' name='product_form' method='post' enctype="multipart/form-data"}}
-
-{{include file="form_errors.phtml"/}}
-
-{{include file="admin_product/form_fields.phtml"/}}
-
-<input name='create' type='submit' value='Create'/>
-{{/form}}
-
+{{wrap with="admin_modal_page_layout.phtml"}}
+  {{into slot='content_zone'}}
+    {{form id='object_form' name='user_form' method='post' enctype="multipart/form-data"}}
+      <h1>Добавление нового продукта</h1>
+      {{include file='admin_product/include/form_fields.phtml'/}}
+    {{/form}}
+  {{/into}}
 {{/wrap}}

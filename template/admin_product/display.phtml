@@ -1,61 +1,61 @@
-<? $this->title='Products'; ?>
-{{wrap with="admin_page_layout.phtml" in="content_zone"}}
+{{wrap with="admin_page_layout.phtml"}}
 
-<a href='{{route_url params="action:create"}}'>Create new product</a>
-<p/>
+  {{include file="_admin/selectors.phtml"/}}
+  {{include file="_admin_object/actions.phtml"/}}
 
-<? $products = lmbActiveRecord :: find('Product'); ?>
+  {{into slot="content_zone"}}
+    <div id="header">
+      <h1>Products</h1>
 
-{{paginate iterator='$products' pager='pager' /}}
+      <div class="header_actions">
+        <a href='{{route_url params="action:create"/}}' title="Добавить элемент" class='thickbox'><img src='/shared/cms/images/icons/page_white_add.png'/> Добавить элемент</a>
+      </div>
+    </div>
 
-{{include file='pager.phtml'/}}
-
-<form name='list_form' method='post'>
-{{list using="$products"}}
-<table cellpadding="0" cellspacing="0" class='list' width='100%'>
-  <thead>
-  <tr>
-    <th>Select</th>
-    <th>Title/Image/Price/Description</th>
-    <th>Actions</th>
-  </tr>
-  </thead>
-  {{list:item}}
-  <tr>
-   <td>
-    <input type='checkbox' name='ids[]' value='{$item.id}' class='input'/>
-    <? if($item->getIsAvailable()) { ?>
-      <img src='images/available.gif' class=''/>
-    <? } else { ?>
-      <img src='images/not_available.gif'/>
-    <? } ?>
-   </td>
-   <td>
-      <dl>
-        <dt>
-          <b>{$item.title}</b><br />
-          Price:<b>{$item.price}</b><br/>
-
-         </dt>
-         <dd>
-            <img src='{$item.image_path}' class='img'/>
-            {$item.description|nl2br}
-         </dd>
-      </dl>
-
-   </td>
-
-   <td>
-     <a href='{{route_url params="action:edit,id:{$item.id}"}}'>Edit</a>&nbsp;
-     <a href='{{route_url params="action:delete,id:{$item.id}"}}'>Delete</a>
-   </td>
-  </tr>
-  {{/list:item}}
-</table>
-{{/list}}
-<input type='hidden' name='action' value='change_availability'/>
-<input type='submit' name='set_available' value='Set available'/>
-<input type='submit' name='set_not_available' value='Set not available'/>
-</form>
-
+    <div id="body">
+      {{list using='{$#items}' parity='{$parity}'}}
+      {{include file="_admin_object/actions.phtml"/}}
+      <div class="list">
+        <div class='list_actions'>
+          {{apply template="selectors_button" action="set_available" title="В наличии" /}}
+          {{apply template="selectors_button" action="set_unavailable" title="Отсутствуют" /}}
+        </div>
+        <table>
+          <tr>
+            <th>{{apply template="selectors_toggler"/}}</th>
+            <th>#ID</th>
+            <th width='20%'>Название</th>
+            <th width='10%'>Цена</th>
+            <th width='10%'>Изображение</th>
+            <th width="10%">Наличие</th>
+            <th width='40%'>Описание</th>
+            <th>Действия</th>
+          </tr>
+          {{list:item}}
+            <tr class='{$parity}'>
+              <td>{{apply template="selector" value="{$item.id}"/}}</td>
+              <td>#{$item.id}</td>
+              <td>{$item.title}</td>
+              <td>{$item.price}</td>
+              <td><img src="{$item.image_path}"/></td>
+              <td><img src="/shared/cms/images/icons/<?= ($item->getIsAvailable()) ? 'lightbulb.png' : 'lightbulb_off.png'; ?>"/></td>
+              <td>{$item.description|raw|nl2br}</td>
+              <td class='actions'>
+                {{apply template="object_action_edit"  item="{$item}" icon="page_white_edit" /}}
+                {{apply template="object_action_delete" item="{$item}" icon="page_white_delete" /}}
+              </td>
+            </tr>
+          {{/list:item}}
+          {{list:empty}}
+            <div class="empty_list">Записи отсутствуют</div>
+          {{/list:empty}}
+        </table>
+        <div class='list_actions'>
+          {{apply template="selectors_button" action="set_available" title="В наличии" /}}
+          {{apply template="selectors_button" action="set_unavailable" title="Отсутствуют" /}}
+        </div>
+      </div>
+      {{/list}}
+    </div>
+  {{/into}}
 {{/wrap}}
