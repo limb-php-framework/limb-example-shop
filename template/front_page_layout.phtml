@@ -32,19 +32,22 @@
         <ul>
           <li><a href="product">Products</a></li>
           <li><a href="cart">Your Cart</a></li>
+          <li><a href="/user/login">Login</a></li>
         </ul>
       </div>
 
-      <dl id="profile">
-        <dt>Profile</dt>
-        <dd>
-					<?php
-					  $user = lmbToolkit :: instance()->getUser();
-					 if($user->is_logged_in) { ?>
-					  Logged in as :{$user.name}
-					<? } ?>
-			  </dd>
-			</dl>
+      <?php
+        $user = lmbToolkit :: instance()->getUser();
+        if($user->is_logged_in) { ?>
+        <dl id="profile">
+          <dt>Profile</dt>
+          <dd>
+					  <p>Logged in as :{$user.name}</p>
+					  <p>email: {$user.email}</p>
+					  <p><a href="/user/logout">Logout</a></p>
+			    </dd>
+			  </dl>
+			<? } ?>
 
     </div>
   </div>
