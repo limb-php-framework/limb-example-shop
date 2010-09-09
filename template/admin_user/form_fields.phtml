@@ -1,0 +1,49 @@
+<div class='tabs'>
+
+  <ul>
+    <li id='properties'><a>Основные свойства</a></li>
+    <li id='address'><a>Адрес</a></li>
+  </ul>
+
+  <div id="tab_properties">
+
+    <table class='fieldset'>
+
+        <tr class="odd">
+          <td class="field_name">{{label for="name"}}Имя:{{/label}}</td>
+          <td class="field_value">{{input id="name" name="name" type="text" title="name"/}}</td>
+          <td class="field_comment"></td>
+        </tr>
+
+        <tr class="even">
+          <td class="field_name">{{label for="login"}}Логин:{{/label}}</td>
+          <td class="field_value">{{input id="login" name="login" type="text" title="login"/}}</td>
+          <td class="field_comment"></td>
+        </tr>
+
+        <tr class="odd">
+          <td class="field_name">{{label for="password"}}Пароль:{{/label}}</td>
+          <td class="field_value">{{input id="password" name="password" type="text" title="hashed_password"/}}</td>
+          <td class="field_comment"></td>
+        </tr>
+
+        <tr class="even">
+          <td class="field_name">{{label for="email"}}email:{{/label}}</td>
+          <td class="field_value">{{input id="email" name="email" type="text" title="email"/}}</td>
+          <td class="field_comment"></td>
+        </tr>
+    </table>
+  </div>
+
+  <div id="tab_address">
+    <table class='fieldset'>
+      <tr class="odd">
+        <td class="field_name">{{label for="address"}}Адрес:{{/label}}</td>
+        <td class="field_value">{{wysiwyg id="address" name="address" width="100%" height="300px" title="address"/}}</td>
+        <td class="field_comment"></td>
+      </tr>
+    </table>
+  </div>
+  <div
+
+</div>

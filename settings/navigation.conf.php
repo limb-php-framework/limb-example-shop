@@ -7,3 +7,10 @@ $conf[lmbCmsUserRoles :: ADMIN][0]['children'][] =
     "url" => "/admin_product/",
     "icon" => "/shared/cms/images/icons/report.png",
 );
+
+$conf[lmbCmsUserRoles :: ADMIN][0]['children'][] =
+  array(
+    "title" => "Пользователи",
+    "url" => "/admin_user/",
+    "icon" => "/shared/cms/images/icons/user.png",
+);

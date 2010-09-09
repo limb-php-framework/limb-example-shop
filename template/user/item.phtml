@@ -1,0 +1,17 @@
+{{wrap with="front_page_layout.phtml" in="content_zone"}}
+  <h1>User #{$this->item.id}</h1>
+  <p><a href="/user/">к списку</a></p>
+  <ul>
+    <li>id: {$this->item.id}</li>
+  
+    <li>name: {$this->item.name}</li>
+  
+    <li>login: {$this->item.login}</li>
+  
+    <li>hashed_password: {$this->item.hashed_password}</li>
+  
+    <li>email: {$this->item.email}</li>
+  
+    <li>address: {$this->item.address|raw}</li>
+  </ul>
+{{/wrap}}

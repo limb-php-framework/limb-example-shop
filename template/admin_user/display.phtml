@@ -1,0 +1,60 @@
+{{wrap with="admin_page_layout.phtml" in="content_zone"}}
+
+  {{include file="_admin/selectors.phtml"/}}
+  {{include file="_admin_object/actions.phtml"/}}
+
+  <div id="header">
+    <h1>Пользователи</h1>
+    <div class="header_actions">
+      {{apply template="object_action" action="create" is_link="true" title="Создать пользователя"/}}
+    </div>
+
+    {{include file='_admin/pager.phtml' items='{$this->items}'/}}
+  </div>
+
+  <div id="body">
+
+    {{list using="{$this->items}" as="$item" counter="$counter" parity='$parity'}}
+
+      <div class='list'>
+        <div class='list_actions'>
+          {{apply template="selectors_button" action="delete" title="Удалить" /}}
+        </div>
+        <table>
+          <tr>
+            <th width="10%">{{apply template="selectors_toggler"/}}</th>
+            <th>#ID {{include file='_admin/sort_by_column.phtml' field='id'/}}</th>
+            <th>Имя {{include file='_admin/sort_by_column.phtml' field='name'/}}</th>
+            <th>Логин {{include file='_admin/sort_by_column.phtml' field='login'/}}</th>
+            <th>email {{include file='_admin/sort_by_column.phtml' field='email'/}}</th>
+            <th>Действия</th>
+          </tr>
+
+          {{list:item}}
+            <tr class="{$parity}">
+              <td>{{apply template="selector" value="{$item.id}"/}}</td>
+              <td>{$item.id}</td>
+              <td>{$item.name}</td>
+              <td>{$item.login}</td>
+              <td>{$item.email}</td>
+              <td class='actions'>
+                {{apply template="object_action_edit" item="{$item}"/}}
+
+                {{apply template="object_action_delete" item="{$item}"/}}
+              </td>
+            </tr>
+          {{/list:item}}
+          {{list:empty}}
+            <div class="empty_list">User отсутствуют</div>
+          {{/list:empty}}
+        </table>
+        <div class='list_actions'>
+          {{apply template="selectors_button" action="delete" title="Удалить" /}}
+        </div>
+      </div>
+
+    {{/list}}
+
+  </div>
+
+{{/wrap}}
