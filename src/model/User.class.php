@@ -10,6 +10,8 @@ class User extends lmbActiveRecord
 
   protected $password;
 
+  protected $is_logged_in = false;
+
   protected function _defineRelations()
   {
     $this->_has_many = array (
@@ -51,6 +53,32 @@ class User extends lmbActiveRecord
   static function cryptPassword($password)
   {
     return md5($password);
+  }
+
+  function login($login, $password)
+  {
+    $hashed_password = User :: cryptPassword($password);
+
+    $criteria = new lmbSQLFieldCriteria('login', $login);
+    $criteria->addAnd(new lmbSQLFieldCriteria('hashed_password', $hashed_password));
+
+    if($user = lmbActiveRecord :: findFirst('User', array('criteria' => $criteria)))
+    {
+      $this->import($user);
+      $this->setIsNew(false);
+      $this->setIsLoggedIn(true);
+      return true;
+    }
+    else
+    {
+      $this->setIsLoggedIn(false);
+      return false;
+    }
+  }
+
+  function logout()
+  {
+    $this->is_logged_in = false;
   }
 
 }
