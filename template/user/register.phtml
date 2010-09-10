@@ -1,0 +1,21 @@
+<? $this->title = 'Registration'; ?>
+{{wrap with="front_page_layout.phtml" in="content_zone"}}
+
+{{form id='register_form' name='register_form' method='post'}}
+
+  {{include file="user/include/form_fields"/}}
+
+  <dl class="required field">
+    <dt><label for="password">Password:</label></dt>
+    <dd>{{input name='password' type='text' title='Password' error_class='error'/}}</dd>
+  </dl>
+
+  <dl class="required field">
+    <dt><label for="repeat_password">Repeat password:</label></dt>
+    <dd>{{input name='repeat_password' type='text' title='Repeat password' error_class='error'/}}</dd>
+  </dl>
+
+  <hr/>
+   <input id='register' type='submit' value='Register'/>
+{{/form}}
+{{/wrap}}

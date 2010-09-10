@@ -1,0 +1,40 @@
+<? $this->title = 'Your profile'; ?>
+{{wrap with="front_page_layout.phtml" in="content_zone"}}
+
+This is your profile page. You can change some of your profile fields as well as your password<br/>
+
+<h2>Profile</h2>
+{{form id='profile_form' name='profile_form' method='post'}}
+
+  {{include file='user/include/form_fields.phtml'/}}
+  <hr/>
+  <input id='edit' name='edit' type='submit' value='Update profile'/>
+
+{{/form}}
+
+<h2>Password change form</h2>
+
+{{form id='change_password_form' name='change_password_form' method='post'}}
+
+  {{include file='_admin/form_errors.phtml'/}}
+
+  <dl class="required field">
+    <dt><label for="name">Old password:</label></dt>
+    <dd>{{input name='old_password' type='text' title='Old password'/}}</dd>
+  </dl>
+
+  <dl class="required field">
+    <dt><label for="name">Password:</label></dt>
+    <dd>{{input name='password' type='text' title='Password'/}}</dd>
+  </dl>
+
+  <dl class="required field">
+    <dt><label for="name">Repeat password:</label></dt>
+    <dd>{{input name='repeat_password' type='text' title='Repeat password'/}}</dd>
+  </dl>
+
+  <hr/>
+  <input id='change_password' name='change_password' type='submit' value='Change password'/>
+
+{{/form}}
+{{/wrap}}

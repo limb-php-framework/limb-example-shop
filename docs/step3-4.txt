@@ -1,0 +1,94 @@
+====== Шаг3.3 Управление списком пользователей ======
+===== Создание класса User =====
+Т.к. мы уже умеем создавать модели, контроллеры и шаблоны, то позволим себе немного расслабится и воспользоваться возможностью [[limb3:ru:packages:constructor#%D0%B3%D0%B5%D0%BD%D0%B5%D1%80%D0%B0%D1%86%D0%B8%D1%8F_%D1%81%D1%83%D1%89%D0%BD%D0%BE%D1%81%D1%82%D0%B5%D0%B9_%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F| генерации сущностей]]:
+<code>
+$ php ./lib/limb/limb.php entity_create
+Project directory [/www/limb-example-shop]: 
+Limb directory [/www/limb-example-shop/lib/]: 
+Table name (could be 'all'): user
+</code>
+После выполнения этих действий у нас должны были появится модель, контроллер и шаблоны, построенные по таблице **user**.
+
+==== Код класса User ====
+
+
+===== Доработка шаблонов и контроллера для управления пользователями =====
+
+==== Добавление ссылки в навигацию ====
+Добавим ссылку в панель навигации.
+
+Файл shop/settings/navigation.conf.php^
+<code php>
+[...]
+$conf[lmbCmsUserRoles :: ADMIN][0]['children'][] =
+  array(
+    "title" => "Пользователи",
+    "url" => "/admin_user/",
+    "icon" => "/shared/cms/images/icons/user.png",
+);
+</code>
+==== Шаблоны ====
+Шаблоны для действий create, edit и display просты и не составят большого труда. Особенно, если учесть, что они уже сгенерированы.
+
+Остановимся только на шаблоне с полями формы:
+
+Файл shop/template/admin_user/form_fields.phtml:
+<code xml>
+<div class='tabs'>
+
+  <ul>
+    <li id='properties'><a>Основные свойства</a></li>
+    <li id='address'><a>Адрес</a></li>
+  </ul>
+
+  <div id="tab_properties">
+
+    <table class='fieldset'>
+
+        <tr class="odd">
+          <td class="field_name">{{label for="name"}}Имя:{{/label}}</td>
+          <td class="field_value">{{input id="name" name="name" type="text" title="name"/}}</td>
+          <td class="field_comment"></td>
+        </tr>
+
+        <tr class="even">
+          <td class="field_name">{{label for="login"}}Логин:{{/label}}</td>
+          <td class="field_value">{{input id="login" name="login" type="text" title="login"/}}</td>
+          <td class="field_comment"></td>
+        </tr>
+
+        <tr class="odd">
+          <td class="field_name">{{label for="password"}}Пароль:{{/label}}</td>
+          <td class="field_value">{{input id="password" name="password" type="text" title="hashed_password"/}}</td>
+          <td class="field_comment"></td>
+        </tr>
+
+        <tr class="even">
+          <td class="field_name">{{label for="email"}}email:{{/label}}</td>
+          <td class="field_value">{{input id="email" name="email" type="text" title="email"/}}</td>
+          <td class="field_comment"></td>
+        </tr>
+    </table>
+  </div>
+
+  <div id="tab_address">
+    <table class='fieldset'>
+      <tr class="odd">
+        <td class="field_name">{{label for="address"}}Адрес:{{/label}}</td>
+        <td class="field_value">{{wysiwyg id="address" name="address" width="100%" height="300px" title="address"/}}</td>
+        <td class="field_comment"></td>
+      </tr>
+    </table>
+  </div>
+  <div
+  
+</div>
+</code>
+Тут есть два момента:
+  * мы использовались автогенерацией вкладок
+  * вместо hashed_password у нас есть поле password, которое, как мы помним хэшируется перед сохранением объекта
+
+===== Далее =====
+
+Мы рекомендуем вам, при помощи этой новой функциональности, добавить себе пользователя и приступить к следующему шагу: [[step4-2|"Шаг4.2 Аутентификация пользователей"]].
+

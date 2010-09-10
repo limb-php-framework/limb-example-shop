@@ -1,0 +1,23 @@
+{{include file='_admin/form_errors.phtml'/}}
+
+<dl class="required field">
+  <dt><label for="title">Login:</label></dt>
+  <dd>{{input name='login' type='text' title='Login'/}}</dd>
+</dl>
+
+<dl class="required field">
+  <dt><label for="name">Name:</label></dt>
+  <dd>{{input name='name' type='text' title='Name'/}}</dd>
+</dl>
+
+<dl class="required field">
+  <dt><label for="email">Email:</label></dt>
+  <dd>{{input name='email' type='text' title='Email' error_class='error'/}}</dd>
+</dl>
+
+<dl class="field">
+  <dt><label for="address">Delivery address:</label></dt>
+  <dd>
+    {{textarea name="address" id='address' type="text" title="Delivery address"/}}
+  </dd>
+</dl>
