@@ -1,4 +1,4 @@
-====== Шаг4.3 Редактирование и отображение профайла пользователя ======
+====== Шаг3.3 Редактирование и отображение профайла пользователя ======
 ===== Редактирование своего профайла =====
 
 Пользователь должен иметь возможность сменить свой пароль, а также поменять свои контактные данные (например, email) при необходимости. Для этого мы реализуем действие edit, которое будет в себя включать весь нужный функционал.
@@ -165,8 +165,6 @@ function doEdit()
 
 Это позволит не выводить ошибки валидации сразу рядом с двумя формами, если пользователь неправильно ввел информацию  в форму по смене пароля.
 
-===== Предварительные результаты =====
-
 Вот как должна выглядеть страница /user/edit:
 
 {{limb3:ru:tutorials:shop:profile.png|}}
@@ -201,7 +199,6 @@ class BaseShopController extends lmbController
   Logged in as :{{$#user.name}}
 <? } ?>
 </code>
-
 
 ==== Использование php-вставок в MACRO-шаблоне ====
 
@@ -244,6 +241,35 @@ class SampleFilter implements lmbInterceptingFilter
 
 Начиная с версии пакета WEB_APP 0.4 (соответствует релизу 2007.2) toolkit поддерживает получение данных через базовые методы get(), к кому же toolkit стал доступен в шаблоне в корневой контейнере данных. Все это позволяет даже не заботиться о передаче user-а в шаблон, а действовать в стиле %%PullView%%:
 
+файл shop/template/user/include/profile_box.phtml:
+<code xml>
+<? if($user->is_logged_in) { ?>
+<dd>
+  User: {$user.name}<br/>
+  Login: {$user.login}<br/>
+  Email: {$user.email}<br/>
+  <a href="/user/edit/">edit</a>
+  <a href="/user/logout/">logout</a>
+</dd>
+<? } else {?>
+<dd>
+  <form method="POST" id='login_form' action='/user/login/'>
+
+    <label for='login'>Login:</label><br/>
+    <input type="text" name="login" id="login" title="Login" class='input'/><br/>
+
+    <label for='passwd'>Password:</label><br/>
+    <input type="text" name="password" id="password" type="password" title="Password" class='input'/><br/>
+
+    <p>Use <b>admin</b>/<b>secret</b> to enter in <a href="/admin/">administration panel</a>.</p>
+
+    <input type='submit' name='submitted' value="Submit"/><br/>
+  </form>
+  <a href="/user/register/">Register</a>
+</dd>
+<? } ?>
+</code>
+
 Файл shop/template/front_page_layout.phtml:
 <code xml>
 [...]
@@ -260,40 +286,14 @@ class SampleFilter implements lmbInterceptingFilter
 
       <dl id="profile">
         <dt>Profile</dt>
-        <? if($this->toolkit->getUser()->is_logged_in) { ?>
-        <dd>
-          User: {$#toolkit.user.name}<br/>
-          Login: {$#toolkit.user.login}<br/>
-          Email: {$#toolkit.user.email}<br/>
-          <a href="/user/profile/">edit</a>
-          <a href="/user/logout/">logout</a>
-        </dd>
-        <? } else {?>
-        <dd>
-          <form method="POST" id='login_form' action='login'>
-
-            <label for='login'>Login:</label><br/>
-            <input type="text" name="login" id="login" title="Login" class='input'/><br/>
-
-            <label for='passwd'>Password:</label><br/>
-            <input type="text" name="password" id="password" type="password" title="Password" class='input'/><br/>
-
-            <p>Use <b>admin</b>/<b>secret</b> to enter in <a href="/admin/">administration panel</a>.</p>
-
-            <input type='submit' name='submitted' value="Submit"/><br/>
-          </form>
-          <a href="/user/register/">Register</a>
-        </dd>
-        <? } ?>
+        {{include file="user/include/profile_box.phtml" user="$#toolkit.user"/}}
       </dl>
 
     </div>
 [...]
 </code>
 
-На этом способе мы и остановимся.
-
-Как видите, способов достаточно много. Начиная с релиза 2007.2, мы рекомендуем использовать способ получения данных в шаблоне через toolkit.
+В этом примере, как вы видите, мы передаем переменную user в шаблон profile_box.
 
 ===== Предварительные итоги =====
 
@@ -303,399 +303,4 @@ class SampleFilter implements lmbInterceptingFilter
 
 ===== Далее =====
 
-[[step5|Шаг5. Отображение списка товаров для покупателей. Поиск товаров]]
-
-
-====== Шаг3. Создание и отображение списка товаров для администраторов ======
-===== Часто используемые шаблоны =====
-
-Пожалуй, мы начнем с изучения шаблонов, которые будут использоваться на многих других шаблонах в панели управления и на фронтальной части. Это шаблоны: 
-  * **pager.phtml** - пейджер для постраничного вывода (limb/cms/template/_admin/pager.phtml)
-  * **form_errors.phtml** - список ошибок валидации форм (limb/cms/template/_admin/form_errors.phtml)
-
-Подробнее о тегах pager и paginate можно прочитать разделе [[limb3:ru:packages:macro:pagination|"Постраничный вывод данных в MACRO-шаблонах"]].
-===== Класс Product =====
-
-Создадим класс Product. Будем считать, что поля title, description и price являются обязательными.
-
-Файл shop/src/model/Product.class.php:
-<code php>
-<?php
-class Product extends lmbActiveRecord
-{
-  protected $_default_sort_params = array('title' => 'ASC');
-
-  protected function _createValidator()
-  {
-    $validator = new lmbValidator();
-    $validator->addRequiredRule('title');
-    $validator->addRequiredRule('description');
-    $validator->addRequiredRule('price');
-    return $validator;
-  }
-
-  function getImagePath()
-  {
-    if(($image_name = $this->getImageName()) && file_exists(lmb_env_get('PRODUCT_IMAGES_DIR') . $image_name))
-      return LIMB_HTTP_BASE_PATH . 'product_images/' . $image_name;
-    else
-      return LIMB_HTTP_BASE_PATH . '/shared/cms/images/icons/cancel.png';
-  }
-}
-</code>
-
-Мы перекрыли в классе фабричный метод **_createValidator()**. Этот метод возвращает валидатор, который используется для проверки данных внутри объектов Product при сохранении. Подробнее о валидации данных в классах ACTIVE_RECORD в разделе [[limb3:ru:packages:active_record:validation|"Валидация данных в объектах"]].
-
-Мы также установили сортировку продуктов по-умолчанию при помощи атрибута **$_default_sort_params**. Теперь при выборках продукты будут сортироваться по заголовку в алфавитном порядке. Подробнее о сортировке по-умолчанию можно узнать в разделе [[limb3:ru:packages:active_record:find|"Поиск и сортировка объектов"]].
-
-Мы также создали метод **getImagePath()**. Этот метод по сути вводит новое **виртуальное поле $image_path**, которое можно использовать в шаблонах (пример будет показан ниже). Поле $image_path мы ввели для того, чтобы не выносить знания о папке product_images/ в шаблоны, и при желании эту папку можно будет легко сменить. Если товар не имеет изображения, тогда будет выводиться иконка cancel.png из набора, входящего в состав пакета CMS.
-
-===== Создание, редактирование и удаление товаров =====
-==== Контроллер AdminProductController ====
-Для начала создадим контроллер для нашей страницы. Все контроллеры панели управления будут иметь префикс Admin - это позволяет использовать встроенный в пакет CMS функционал по ограничению доступа (см. lmbCmsAccessPolicyFilter). 
-
-Файл **shop/src/controller/AdminProductController.class.php**:
-<code php>
-<?php
-lmb_require('limb/cms/src/controller/lmbAdminObjectController.class.php');
-
-class AdminProductController extends lmbAdminObjectController
-{
-  protected $_object_class_name = 'Product';
-}
-</code>
-В данном случае мы воспользуемся возможностями контроллера lmbAdminObjectController, чтобы не дублировать логику.
-==== Добавление ссылки в панель навигации ====
-Чтобы добавить ссылку в панель создадим файл **shop/settings/navigation.conf.php** со следующим содержимым:
-<code php>
-<?php
-require_once('limb/cms/settings/navigation.conf.php');
-
-$conf[lmbCmsUserRoles :: ADMIN][0]['children'][] =
-  array(
-    "title" => "Товары",
-    "url" => "/admin_product/",
-    "icon" => "/shared/cms/images/icons/report.png",
-);
-</code>
-Теперь ссылка на страницу просмотра товаров должна отобразится на панели.
-
-==== Шаблон admin_product/display.phtml ====
-
-Файл shop/template/admin_product/display.phtml:
-<code xml>
-{{wrap with="admin_page_layout.phtml"}}
-
-  {{include file="_admin/selectors.phtml"/}}
-  {{include file="_admin_object/actions.phtml"/}}
-
-  {{into slot="content_zone"}}
-    <div id="header">
-      <h1>Products</h1>
-
-      <div class="header_actions">
-        <a href='{{route_url params="action:create"/}}' title="Добавить элемент" class='thickbox'><img src='/shared/cms/images/icons/page_white_add.png'/> Добавить элемент</a>
-      </div>
-    </div>
-
-    <div id="body">
-      {{list using='{$#items}' parity='{$parity}'}}
-      {{include file="_admin_object/actions.phtml"/}}
-      <div class="list">
-        <table>
-          <tr>
-            <th>#ID</th>
-            <th width='20%'>Название</th>
-            <th width='10%'>Цена</th>
-            <th width='10%'>Изображение</th>
-            <th width="10%">Наличие</th>
-            <th width='40%'>Описание</th>
-            <th>Действия</th>
-            </tr>
-            {{list:item}}
-            <tr class='{$parity}'>
-              <td>#{$item.id}</td>
-              <td>{$item.title}</td>
-              <td>{$item.price}</td>
-              <td><img src="{$item.image_path}"/></td>
-              <td><img src="/shared/cms/images/icons/<?= ($item->getIsAvailable()) ? 'lightbulb.png' : 'lightbulb_off.png'; ?>"/></td>
-              <td>{$item.description|raw|nl2br}</td>
-              <td class='actions'>
-                {{apply template="object_action_edit"  item="{$item}" icon="page_white_edit" /}}
-                {{apply template="object_action_delete" item="{$item}" icon="page_white_delete" /}}
-              </td>
-            </tr>
-            {{/list:item}}
-            {{list:empty}}
-              <div class="empty_list">Записи отсутствуют</div>
-            {{/list:empty}}
-          </table>
-        </div>
-      {{/list}}
-    </div>
-  {{/into}}
-{{/wrap}}
-</code>
-
-Поясним некоторые моменты:
-  * $#items (алиас к $this->items) добавлен в шаблон базовой реализацией экшена doDisplay(), описанной в файле **lmbAdminOjectController**.
-  * Чтобы не писать лишний раз пейджер для панели управления, мы воспользовались имеющимся в пакете CMS, передав туда коллекцию продуктов. Сам файл с пейджером мы подключили при помощи тега [[limb3:ru:packages:macro:tags:core_tags:include_tag| {{include}}]].
-  * Для создания ссылок мы используем тег [[limb3:ru:packages:macro:tags:lmb_request_tags:lmb_route_url_tag| {{route_url}}]]
-  * При помощи тега [[limb3:ru:packages:macro:tags:list_tags:list_tag| {{list}}]] и [[limb3:ru:packages:macro:tags:list_tags:list_item_tag| {{list:item}}]] выводятся списковые данные.
-  * Фильтр [[limb3:ru:packages:macro:filters#raw|raw]] в выражении {$item.description|raw|nl2br} применяется для того, чтобы отменить действие фильтра html, который применяет фунцию htmlspecialchars для значения выводимой переменной. Фильтр [[limb3:ru:packages:macro:filters#nl2br|nl2br]] используется для применения функции nl2br (new line to %%<br/>%%) к выводимой переменной {$item.description}.
-  * Поля $image_path в таблице product нет. Это виртуальное поле и для него мы создали метод Product :: getImagePath(), который будет возвращать путь до изображения.
-  * Для вывода возможных действий(редактирование и удаление) мы воспользовались тегом [[limb3:ru:packages:macro:tags:core_tags:apply_tag| {{apply}}]]. Использованные нами "куски" шаблонов можно посмотреть в файле **limb/cms/template/_admin_object/actions.phtml**.
-
-Дополнительная информация о том, как данные из %%ActiveRecord%%-ов попадает в шаблоны доступна в разделе [[limb3:ru:packages:active_record:in_macro_templates|Использование ACTIVE_RECORD в шаблонах MACRO]]. Предупреждение: некоторые вещи пока вам могут быть незнакомыми!
-
-==== Шаблоны admin_product/create.html и admin_product/edit.html ====
-
-Файл shop/template/admin_product/create.phtml:
-<code xml>
-{{wrap with="admin_modal_page_layout.phtml"}}
-  {{into slot='content_zone'}}
-    {{form id='object_form' name='user_form' method='post' enctype="multipart/form-data"}}
-      <h1>Добавление нового продукта</h1>
-      {{include file='admin_product/include/form_fields.phtml'/}}
-    {{/form}}
-  {{/into}}
-{{/wrap}}
-</code>
-
-Файл shop/template/admin_product/edit.phtml:
-<code xml>
-{{wrap with="admin_modal_page_layout.phtml" into="content_zone"}}
-  <h1>Редактирование продукта &quot;{$#item.title}&quot;</h1>
-  {{form id='object_form' name='object_form' method='post' enctype="multipart/form-data"}}
-    {{include file='admin_product/include/form_fields.phtml'/}}
-  {{/form}}
-{{/wrap}}
-</code>
-
-Подробнее об тегах форм в разделе [[limb3:ru:packages:macro:form_tags|"Теги форм и элементов форм"]].
-
-Так как поля для обоих форм одинаковые, мы решили вынести их в общий шаблон **form_fields.phtml**
-
-Файл shop/template/admin_product/form_fields.html:
-<code xml>
-{{include file='_admin/form_errors.phtml'/}}
-
-<dl class="required field">
-  <dt><label for="title">Название:</label></dt>
-  <dd>{{input name='title' type='text' title='Название'/}}</dd>
-</dl>
-
-<dl class="required field">
-  <dt><label for="price">Цена:</label></dt>
-  <dd>{{input name='price' type='text' title='Цена'/}}</dd>
-</dl>
-
-<dl class="field">
-  <dt><label for="is_available">Наличие:</label>
-  <dd>{{js_checkbox name='is_available'/}}</dd>
-</dl>
-
-<dl class="required field">
-  <dt><label for="description">Описание:</label>
-  <dd>{{textarea name='description' title='Описание'/}}</dd>
-</dl>
-
-<dl class="field">
-  <dt><label for="image">Изображение:</label>
-  <dd>
-  {{input name="image" type="file"/}}
-  <img src='{$#item.image_path}' class='img' />
-  </dd>
-</dl>
-
-{{include file='_admin/form_buttons.phtml'/}}
-</code>
-
-Тег [[limb3:ru:packages:macro:tags:form_tags:js_checkbox_tag| {{js_checkbox}}]] используется для формирования специального checkbox-а, который всегда присылает свое значение, даже флаг не установлен. Это по сути избавит нас от одной лишней проверки в контроллере.
-==== Доработка контроллера AdminProductController ====
-
-Уже сейчас мы можем создавать и редактировать товары, благодаря использованию lmbAdminObjectController, в качестве базового. Но, к сожалению, он не знает как мы храним изображения. И именно этому его придется научить.
-
-Файл %%shop/src/controller/AdminProductController.class.php%%:
-<code php>
-<?php
-lmb_require('limb/cms/src/controller/lmbAdminObjectController.class.php');
-lmb_require('limb/util/system/lmbFs.class.php');
-
-class AdminProductController extends lmbAdminObjectController
-{
-  protected $_object_class_name = 'Product';
-
-  protected function _onBeforeSave()
-  {
-  	return $this->_uploadImage($this->item, $this->request->get('image'));
-  }
-
-  function _uploadImage($item, $uploaded_image)
-  {
-    if(!$uploaded_image)
-      return;
-
-    if(!$uploaded_image['name'] || !$uploaded_image['tmp_name'])
-      return;
-
-    $file_name = $uploaded_image['name'];
-    $file_path = $uploaded_image['tmp_name'];
-
-    $dest_path = lmb_env_get('PRODUCT_IMAGES_DIR') . $file_name;
-    lmbFs :: cp($file_path, $dest_path);
-
-    unlink($file_path);
-
-    $item->setImageName($file_name);
-  }
-}
-</code>
-
-Метод _onAfterImport() является специальным методом (без реализации) в lmbAdminObjectController и вызывается непосредственно после импортирования свойств в сохраняемый объект (см. lmbAdminObjectController :: _import()). Непосредственно обработку изображения мы выделили в отдельный метод _uploadImage(). Переменная $_FILES обрабатывается в классе lmbHttpRequest, поэтому мы можем получить данные по изображению через объект $request. Загруженное изображение сохраняется в папке, определенной переменной окружения PRODUCT_IMAGES_DIR, о которой мы говорили в [[step2|шаге 2]].
-
-Реализацию собственной логики обработки полей мы рассмотрим на [[step4-1| шаге 4.1]].
-
-==== Первый результат ====
-
-Попробуйте теперь зайти на страницу /admin_product и "поиграть" с ней, например, создать с десяток товаров, отредактировать и удалить некоторых из них. 
-
-Если у вас нет желания добавлять товары самостоятельно, то можете скопировать содержимое shop_example_dir/www/product_images к себе в проект и залить db.mysql из shop_example_dir/init/ к себе в базу данных проекта. Мы позволили себе немного позаимствовать описания книг с Amazon.com ;-)
-
-Страница списка товаров в панели управления должны выглядеть следующим образом:
-
-{{limb3:ru:tutorials:shop:admin_products.png}}
-===== Смена статуса доступности товара =====
-
-Иногда владельцу магазина необходимо временно снять с продажи сразу несколько товаров. Снимать галочки в форме редактирования для каждого товара - занятие довольно утомительное, поэтому мы реализуем возможность смены статуса доступности товаров сразу для нескольких товаров прямо из списка товаров.
-
-Для этого нам необходимо будет немного модифицировать шаблон shop/template/admin_product/display.html:
-<code xml>
-[...]
-      <div class="list">
-        <div class='list_actions'>
-          {{apply template="selectors_button" action="set_available" title="В наличии" /}}
-          {{apply template="selectors_button" action="set_unavailable" title="Отсутствуют" /}}
-        </div>
-        <table>
-          <tr>
-            <th>{{apply template="selectors_toggler"/}}</th>
-            <th>#ID</th>
-            <th width='20%'>Название</th>
-            <th width='10%'>Цена</th>
-            <th width='10%'>Изображение</th>
-            <th width="10%">Наличие</th>
-            <th width='40%'>Описание</th>
-            <th>Действия</th>
-          </tr>
-          {{list:item}}
-            <tr class='{$parity}'>
-              <td>{{apply template="selector" value="{$item.id}"/}}</td>
-              <td>#{$item.id}</td>
-              <td>{$item.title}</td>
-              <td>{$item.price}</td>
-              <td><img src="{$item.image_path}"/></td>
-              <td><img src="/shared/cms/images/icons/<?= ($item->getIsAvailable()) ? 'lightbulb.png' : 'lightbulb_off.png'; ?>"/></td>
-              <td>{$item.description|raw|nl2br}</td>
-              <td class='actions'>
-                {{apply template="object_action_edit"  item="{$item}" icon="page_white_edit" /}}
-                {{apply template="object_action_delete" item="{$item}" icon="page_white_delete" /}}
-              </td>
-            </tr>
-          {{/list:item}}
-          {{list:empty}}
-            <div class="empty_list">Записи отсутствуют</div>
-          {{/list:empty}}
-        </table>
-        <div class='list_actions'>
-          {{apply template="selectors_button" action="set_available" title="В наличии" /}}
-          {{apply template="selectors_button" action="set_unavailable" title="Отсутствуют" /}}
-        </div>
-      </div>
-[...]
-</code>
-
-Мы добавили div'ы с кнопками сверху и снизу списка, а так же checkbox-ы для каждой строки.
-
-Примененный нами (через тег apply) шаблон **selectors_button** предназначен как раз для таких групповых действий. Он рисует кнопку выводящую popup-окно для указанного действия (set_available и set_unavailable в нашем случае)
-
-Итак, теперь нужно добавить два новых действия в контроллер %%AdminProductController%%:
-<code php>
-class AdminProductController extends lmbController
-{
-  [...]
-  function doSetAvailable()
-  {
-  	return $this->_changeAvailability(true);
-  }
-
-  function doSetUnavailable()
-  {
-  	return $this->_changeAvailability(false);
-  }
-
-  protected function _changeAvailability($is_available)
-  {
-    if(!$ids = $this->request->getArray('ids'))
-    {
-      $this->_endDialog();
-      return;
-    }
-
-    $products = lmbActiveRecord :: findByIds('Product', $ids);
-    foreach($products as $product)
-    {
-      $product->setIsAvailable((int) $is_available);
-      $product->save();
-    }
-
-    $this->_endDialog();
-  }
-}
-</code>
-
-Здесь мы воспользовались find()-методом класса lmbActiveRecord :: **findByIds($class_name, $ids, $params = array())**, который позволяет загрузить сразу несколько объектов по их идентификаторам.
-
-Справедливости ради отметим, что в данном случае, возможно, можно было обойтись простым UPDATE запросом к базе данных, чем сначала загружать объекты в память и изменять их по одному. Да, в простых случаях так действовать можно для оптимизации быстродействия, однако если с изменением статусов связаны какие-либо бизнес-правила, мы рекомендуем все же использовать API класса lmbActiveRecord.
-
-Покажем как бы выглядел код данного метода, если бы мы гнались за скоростью выполнения:
-<code php>
-[...]
-
-  protected function _changeAvailability($is_available)
-  {
-    if(!$ids = $this->request->getArray('ids'))
-    {
-      $this->_endDialog();
-      return;
-    }
-
-    $is_available = (int) $is_available;
-
-    $sql = 'UPDATE product SET is_available = ' . $is_available. 
-           ' WHERE id IN (' . implode(',', array_map('intval', $ids)) . ')';
-    $this->toolkit->getDefaultDbConnection()->execute($sql);
-
-    $this->_endDialog();
-  }
-[...]
-</code>
-
-Для выполнения запроса к базе данных напрямую нам потребовался явный доступ к объекту $connection, который можно получить из toolkit-а при помощи метода **getDefaultDbConnection()**.
-
-Для безопасности мы также пропустили каждый элемент массива $ids через метод intval.
-
-О toolkit будет рассказано чуть позже. Для особо нетерпеливых можно порекомендовать ознакомиться с [[limb3:ru:packages:toolkit|описанием пакета TOOLKIT]] (хотя мы не рекомендуем пока этого делать).
-
-===== Далее =====
-
-Следующий шаг - [[step4|"Шаг4. Защита панели управления от несанкционированного доступа"]]:
-  - Мы введем возможность создавать новых пользователей - администраторов. 
-  - Далее введем процедуру аутентификации на сайте. 
-  - После этого создадим новый фильтр, который будет проверять наличие достаточных прав у пользователя и поместим его в цепочку фильтров приложения.
-
-Вы узнаете:
-  * как организована работа приложения на базе Limb, 
-  * как работать с сессией,
-  * что такое toolkit,
-  * как передавать данных из контроллера в шаблон.
+Для удобства работы с пользователями добваим CRUD в панель управления - [[.step3-4| Шаг3.4 Управление списком пользователей]]

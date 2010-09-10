@@ -15,11 +15,7 @@ class User extends lmbActiveRecord
   protected function _defineRelations()
   {
     $this->_has_many = array (
-      'orders' =>
-        array (
-          'field' => 'user_id',
-          'class' => 'Order',
-        ),
+      'orders' => array ('field' => 'user_id', 'class' => 'Order'),
     );  }
 
   protected function _createValidator()

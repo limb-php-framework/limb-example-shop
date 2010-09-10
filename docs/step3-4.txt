@@ -1,25 +1,155 @@
-====== Шаг3.3 Управление списком пользователей ======
-===== Создание класса User =====
-Т.к. мы уже умеем создавать модели, контроллеры и шаблоны, то позволим себе немного расслабится и воспользоваться возможностью [[limb3:ru:packages:constructor#%D0%B3%D0%B5%D0%BD%D0%B5%D1%80%D0%B0%D1%86%D0%B8%D1%8F_%D1%81%D1%83%D1%89%D0%BD%D0%BE%D1%81%D1%82%D0%B5%D0%B9_%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F| генерации сущностей]]:
-<code>
-$ php ./lib/limb/limb.php entity_create
-Project directory [/www/limb-example-shop]: 
-Limb directory [/www/limb-example-shop/lib/]: 
-Table name (could be 'all'): user
-</code>
-После выполнения этих действий у нас должны были появится модель, контроллер и шаблоны, построенные по таблице **user**.
+====== Шаг3.4 Управление списком пользователей ======
+Одна из основных функций пакета CMS, это панель управления. Попасть в нее можно по адресу http://sitename/admin (логин: admin, пароль: secret). На этом
+шаге мы построим CRUD-интерфейс для управления пользователями.
 
-==== Код класса User ====
+===== Создание контроллера для панели управления =====
+Для начала создадим контроллер для нашей страницы. Все контроллеры панели управления будут иметь префикс Admin - это позволяет использовать встроенный в пакет CMS функционал по ограничению доступа (см. lmbCmsAccessPolicyFilter). 
 
-
-===== Доработка шаблонов и контроллера для управления пользователями =====
-
-==== Добавление ссылки в навигацию ====
-Добавим ссылку в панель навигации.
-
-Файл shop/settings/navigation.conf.php^
+Файл shop/src/controller/AdminUserController.class.php:
 <code php>
-[...]
+<?php
+lmb_require('limb/cms/src/controller/lmbAdminObjectController.class.php');
+
+class AdminUserController extends lmbAdminObjectController
+{
+  protected $_object_class_name = 'User';
+}
+</code>
+По суди единственное, что нам нужно сделать - указать класс, с которым работает контроллер.
+
+===== Шаблоны =====
+==== Шаблон списка пользователей ====
+<code xml>
+{{wrap with="admin_page_layout.phtml" in="content_zone"}}
+
+  {{include file="_admin/selectors.phtml"/}}
+  {{include file="_admin_object/actions.phtml"/}}
+
+  <div id="header">
+    <h1>Users</h1>
+    <div class="header_actions">
+      {{apply template="object_action" action="create" is_link="true" title="Create user"/}}
+    </div>
+
+    {{include file='_admin/pager.phtml' items='{$this->items}'/}}
+  </div>
+
+  <div id="body">
+
+    {{list using="{$#items}" as="$item" counter="$counter" parity='$parity'}}
+
+      <div class='list'>
+        <table>
+          <tr>
+            <th>#ID</th>
+            <th>Name</th>
+            <th>Login</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Actions</th>
+          </tr>
+
+          {{list:item}}
+            <tr class="{$parity}">
+              <td>{$item.id}</td>
+              <td>{$item.name}</td>
+              <td>{$item.login}</td>
+              <td>{$item.email}</td>
+              <td>{$item.address|raw|nl2br}</td>
+              <td class='actions'>
+                {{apply template="object_action_edit" item="{$item}"/}}
+                {{apply template="object_action_delete" item="{$item}"/}}
+              </td>
+            </tr>
+          {{/list:item}}
+          {{list:empty}}
+            <div class="empty_list">Empty</div>
+          {{/list:empty}}
+        </table>
+      </div>
+
+    {{/list}}
+
+  </div>
+
+{{/wrap}}
+</code>
+
+Поясним некоторые моменты:
+  * $#items (алиас к $this->items) добавлен в шаблон базовой реализацией экшена doDisplay(), описанной в файле **lmbAdminOjectController**.
+  * Чтобы не писать лишний раз пейджер для панели управления, мы воспользовались имеющимся в пакете CMS, передав туда коллекцию продуктов. Сам файл с пейджером (_admin/pager.phtml) мы подключили при помощи тега [[limb3:ru:packages:macro:tags:core_tags:include_tag| {{include}}]].
+  * Для создания ссылок мы используем тег [[limb3:ru:packages:macro:tags:lmb_request_tags:lmb_route_url_tag| {{route_url}}]]
+  * При помощи тега [[limb3:ru:packages:macro:tags:list_tags:list_tag| {{list}}]] и [[limb3:ru:packages:macro:tags:list_tags:list_item_tag| {{list:item}}]] выводятся списковые данные.
+  * Фильтр [[limb3:ru:packages:macro:filters#raw|raw]] в выражении {$item.address|raw|nl2br} применяется для того, чтобы отменить действие фильтра html, который применяет фунцию htmlspecialchars для значения выводимой переменной. Фильтр [[limb3:ru:packages:macro:filters#nl2br|nl2br]] используется для применения функции nl2br (new line to %%<br/>%%) к выводимой переменной {$item.description}.
+  * Для вывода возможных действий(редактирование и удаление) мы воспользовались тегом [[limb3:ru:packages:macro:tags:core_tags:apply_tag| {{apply}}]]. Использованные нами "куски" шаблонов можно посмотреть в файле **limb/cms/template/_admin_object/actions.phtml**. Основная их особенность в том, что вместо перезагрузки всей страницы, они выводят модальное окно.
+
+Дополнительная информация о том, как данные из %%ActiveRecord%%-ов попадает в шаблоны доступна в разделе [[limb3:ru:packages:active_record:in_macro_templates|Использование ACTIVE_RECORD в шаблонах MACRO]]. Предупреждение: некоторые вещи пока вам могут быть незнакомыми!
+
+==== Шаблоны для создания и редактирования пользователей ====
+<code xml>
+{{wrap with="admin_modal_page_layout.phtml" into="content_zone"}}
+  {{form id='object_form' name='user_form' method='post' enctype="multipart/form-data"}}
+
+    <h1>Create user</h1>
+
+    {{include file='_admin/form_errors.phtml'/}}
+    {{include file='admin_user/include/form_fields.phtml'/}}
+    {{include file='_admin/form_buttons.phtml'/}}
+
+  {{/form}}
+{{/wrap}}
+</code>
+Обратите внимание, что в качестве базового шаблона мы используем не admin_page_layout, а admin_modal_page_layout, который адаптирован для вывода внутри модального окна.
+
+Файл shop/admin_user/edit.phtml:
+<code xml>
+{{wrap with="admin_modal_page_layout.phtml" into="content_zone"}}
+  {{form id='object_form' name='object_form' method='post' enctype="multipart/form-data" runat='server'}}
+
+    <h1>User &laquo;{$this->item.name}&raquo;</h1>
+    {{include file='_admin/form_errors.phtml'/}}
+    {{include file='admin_user/include/form_fields.phtml'/}}
+    {{include file='_admin/form_buttons.phtml'/}}
+
+  {{/form}}
+{{/wrap}}
+</code>
+
+Подробнее об тегах форм в разделе [[limb3:ru:packages:macro:form_tags|"Теги форм и элементов форм"]].
+
+Так как поля для обоих форм одинаковые, мы решили вынести их в общий шаблон **form_fields.phtml**
+
+Файл shop/template/admin_user/include/form_fields.html:
+<code xml>
+<div class='tabs'>
+
+  <ul>
+    <li id='properties'><a>Properties</a></li>
+  </ul>
+
+  <div id="tab_properties">
+
+    {{include file="user/include/form_fields.phtml"/}}
+
+    <dl class="field">
+      <dt>{{label for="name"}}Password:{{/label}}</dt>
+      <dd>{{input name='password' type='text' title='Password'/}}</dd>
+    </dl>
+
+  </div>
+</div>
+</code>
+
+Некоторые особенности форм на панели управления:
+  * Мы использовались автогенерацией вкладок. Элементы списка внутри div, с классом 'tabs', преобразуются во вкладки. Так, например, вкладка с id=properties
+  берет содержимое из div с id=tab_properties.
+  * вместо hashed_password у нас есть поле password, которое, как мы помним хэшируется перед сохранением объекта
+  
+==== Добавление ссылки в навигацию ====
+Чтобы добавить ссылку в панель создадим файл **shop/settings/navigation.conf.php** со следующим содержимым:
+<code php>
+<?php
+require_once('limb/cms/settings/navigation.conf.php');
 $conf[lmbCmsUserRoles :: ADMIN][0]['children'][] =
   array(
     "title" => "Пользователи",
@@ -27,68 +157,8 @@ $conf[lmbCmsUserRoles :: ADMIN][0]['children'][] =
     "icon" => "/shared/cms/images/icons/user.png",
 );
 </code>
-==== Шаблоны ====
-Шаблоны для действий create, edit и display просты и не составят большого труда. Особенно, если учесть, что они уже сгенерированы.
-
-Остановимся только на шаблоне с полями формы:
-
-Файл shop/template/admin_user/form_fields.phtml:
-<code xml>
-<div class='tabs'>
-
-  <ul>
-    <li id='properties'><a>Основные свойства</a></li>
-    <li id='address'><a>Адрес</a></li>
-  </ul>
-
-  <div id="tab_properties">
-
-    <table class='fieldset'>
-
-        <tr class="odd">
-          <td class="field_name">{{label for="name"}}Имя:{{/label}}</td>
-          <td class="field_value">{{input id="name" name="name" type="text" title="name"/}}</td>
-          <td class="field_comment"></td>
-        </tr>
-
-        <tr class="even">
-          <td class="field_name">{{label for="login"}}Логин:{{/label}}</td>
-          <td class="field_value">{{input id="login" name="login" type="text" title="login"/}}</td>
-          <td class="field_comment"></td>
-        </tr>
-
-        <tr class="odd">
-          <td class="field_name">{{label for="password"}}Пароль:{{/label}}</td>
-          <td class="field_value">{{input id="password" name="password" type="text" title="hashed_password"/}}</td>
-          <td class="field_comment"></td>
-        </tr>
-
-        <tr class="even">
-          <td class="field_name">{{label for="email"}}email:{{/label}}</td>
-          <td class="field_value">{{input id="email" name="email" type="text" title="email"/}}</td>
-          <td class="field_comment"></td>
-        </tr>
-    </table>
-  </div>
-
-  <div id="tab_address">
-    <table class='fieldset'>
-      <tr class="odd">
-        <td class="field_name">{{label for="address"}}Адрес:{{/label}}</td>
-        <td class="field_value">{{wysiwyg id="address" name="address" width="100%" height="300px" title="address"/}}</td>
-        <td class="field_comment"></td>
-      </tr>
-    </table>
-  </div>
-  <div
-  
-</div>
-</code>
-Тут есть два момента:
-  * мы использовались автогенерацией вкладок
-  * вместо hashed_password у нас есть поле password, которое, как мы помним хэшируется перед сохранением объекта
 
 ===== Далее =====
 
-Мы рекомендуем вам, при помощи этой новой функциональности, добавить себе пользователя и приступить к следующему шагу: [[step4-2|"Шаг4.2 Аутентификация пользователей"]].
+Следующий шаг - [[.step4|"Шаг4. Создание и отображение списка товаров для администраторов"]]. Мы создадим для администраторов сайта список товаров с разделением на страницы, сделаем формы для создания нового товара и редактирования старых, реализуем действие для удаления товаров.
 

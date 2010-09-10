@@ -34,22 +34,16 @@
         <ul>
           <li><a href="product">Products</a></li>
           <li><a href="cart">Your Cart</a></li>
-          <li><a href="/user/login">Login</a></li>
+          <? if($this->toolkit->getUser()->is_logged_in) { ?>
+            <li><a href="/orders/">Your Orders</a></li>
+          <? } ?>
         </ul>
       </div>
 
-      <?php
-        $user = lmbToolkit :: instance()->getUser();
-        if($user->is_logged_in) { ?>
-        <dl id="profile">
-          <dt>Profile</dt>
-          <dd>
-					  <p>Logged in as :{$user.name}</p>
-					  <p>email: {$user.email}</p>
-					  <p><a href="/user/logout">Logout</a></p>
-			    </dd>
-			  </dl>
-			<? } ?>
+      <dl id="profile">
+        <dt>Profile</dt>
+        {{include file="user/include/profile_box.phtml" user="$#toolkit.user"/}}
+      </dl>
 
     </div>
   </div>

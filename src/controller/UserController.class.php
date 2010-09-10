@@ -97,8 +97,7 @@ class UserController extends lmbController
     }
   }
 
-
-/*  function doLogin()
+  function doLogin()
   {
     if(!$this->request->hasPost())
       return;
@@ -140,5 +139,5 @@ class UserController extends lmbController
     $user->logout();
     $this->toolkit->getSession()->remove('user_id');
     $this->response->redirect('/');
-  } */
+  }
 }

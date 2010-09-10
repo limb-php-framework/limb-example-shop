@@ -1,0 +1,25 @@
+<? if($user->is_logged_in) { ?>
+<dd>
+  User: {$user.name}<br/>
+  Login: {$user.login}<br/>
+  Email: {$user.email}<br/>
+  <a href="/user/edit/">edit</a>
+  <a href="/user/logout/">logout</a>
+</dd>
+<? } else {?>
+<dd>
+  <form method="POST" id='login_form' action='/user/login/'>
+
+    <label for='login'>Login:</label><br/>
+    <input type="text" name="login" id="login" title="Login" class='input'/><br/>
+
+    <label for='passwd'>Password:</label><br/>
+    <input type="text" name="password" id="password" type="password" title="Password" class='input'/><br/>
+
+    <p>Use <b>admin</b>/<b>secret</b> to enter in <a href="/admin/">administration panel</a>.</p>
+
+    <input type='submit' name='submitted' value="Submit"/><br/>
+  </form>
+  <a href="/user/register/">Register</a>
+</dd>
+<? } ?>
