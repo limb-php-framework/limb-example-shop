@@ -55,6 +55,11 @@ class UserController extends lmbController
 }
 ?>
 </code>
+Напомним наиболее важные моменты работы lmbController:
+  * Объекты **$request**, **$response**, **$error_list**, **$view** доступны в контроллере как атрибуты класса lmbController.
+  * Метод lmbController :: **useForm($form_id)** необходим чтобы передать список ошибок валидации ($error_list) в активный компонент формы в MACRO-шаблоне. В шаблонах admin_product/create.html и admin_product/edit.html мы использовали тег %%{{form id='object_form' name='object_form' method='post' enctype="multipart/form-data"}}%%, который будет преобразован MACRO в активный компонент времени исполнения.
+  * Метод lmbController :: **setFormDatasource($datasource)** передает в выбранную форму контейнер с данными. Это позволяет не терять данные в полях при ошибках валидации.
+  * Метод lmbActiveRecord :: **trySave($error_list)** - проверяет данные и сохраняет объект, если все данные введены верно. Возращает true, если все прошло успешно. Если некоторые поля содержали ошибки, то ошибки будут помешены в объект $error_list.
 
 Метод **addError($message)** и **flashMessage($message)** класса lmbController для вас новые. Первый необходим для добавления ошибки в error_list контроллера, чтобы потом отобразить его в форме. Нам он необходим для того чтобы валидация формы и валидация самой модели выглядели для пользователя одинаково. Методы lmbController :: flashError($message), lmbController :: flashMessage($message) и lmbController :: flashAndRedirect($message, $url) предназначены для передачи ошибок или других сообщения в шаблон, наподобие того, как это происходит в Rails (конечно, если вы в курсе). Эти методы на самом деле делегируют запросы в тулкит. Поэтому мы могли бы написать, например, $this->toolkit->flashError($message) и результат был бы тот же. Сообщения, выводимые через flashError() и flashMessage() хранятся в сесии и удаляются из нее в момент их отображения в шаблоне. Для отображения ошибок нам придется модифицировать шаблон frint_page_layout.html, о чем мы расскажем ниже. 
 
