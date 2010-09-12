@@ -29,6 +29,13 @@ class AdminUserController extends lmbAdminObjectController
     * идентификаторы удаляемых объектов приходят в параметре 'ids'
 
 ===== Шаблоны =====
+
+Пожалуй, мы начнем с изучения шаблонов, которые будут использоваться на многих других шаблонах в панели управления и на фронтальной части. Это шаблоны: 
+  * **pager.phtml** - пейджер для постраничного вывода (limb/cms/template/_admin/pager.phtml)
+  * **form_errors.phtml** - список ошибок валидации форм (limb/cms/template/_admin/form_errors.phtml)
+  
+Подробнее о тегах pager и paginate можно прочитать разделе [[limb3:ru:packages:macro:pagination|"Постраничный вывод данных в MACRO-шаблонах"]].
+
 ==== Шаблон списка пользователей ====
 <code xml>
 {{wrap with="admin_page_layout.phtml" in="content_zone"}}
