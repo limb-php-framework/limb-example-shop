@@ -4,6 +4,10 @@ class User extends lmbActiveRecord
 {
   protected $_db_table_name = 'user';
 
+  protected $_has_many = array('orders' => array('field' => 'user_id',
+                                                 'class' => 'Order',
+                                                 'sort_params' => array('date' => 'DESC')));
+
   protected $_default_sort_params = array('name' => 'ASC');
 
   protected $_lazy_attributes = array('address');
