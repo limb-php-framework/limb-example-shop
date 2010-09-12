@@ -8,7 +8,7 @@
       <h1>Products</h1>
 
       <div class="header_actions">
-        <a href='{{route_url params="action:create"/}}' title="Добавить элемент" class='thickbox'><img src='/shared/cms/images/icons/page_white_add.png'/> Добавить элемент</a>
+        <a href='{{route_url params="action:create"/}}' title="Create product" class='thickbox'><img src='/shared/cms/images/icons/page_white_add.png'/> Create product</a>
       </div>
     </div>
 
@@ -17,19 +17,19 @@
       {{include file="_admin_object/actions.phtml"/}}
       <div class="list">
         <div class='list_actions'>
-          {{apply template="selectors_button" action="set_available" title="В наличии" /}}
-          {{apply template="selectors_button" action="set_unavailable" title="Отсутствуют" /}}
+          {{apply template="selectors_button" action="set_available" title="Set available" /}}
+          {{apply template="selectors_button" action="set_unavailable" title="Set unavailable" /}}
         </div>
         <table>
           <tr>
             <th>{{apply template="selectors_toggler"/}}</th>
             <th>#ID</th>
-            <th width='20%'>Название</th>
-            <th width='10%'>Цена</th>
-            <th width='10%'>Изображение</th>
-            <th width="10%">Наличие</th>
-            <th width='40%'>Описание</th>
-            <th>Действия</th>
+            <th width='20%'>Title</th>
+            <th width='10%'>Price</th>
+            <th width='10%'>Image</th>
+            <th width="10%">Availability</th>
+            <th width='40%'>Decsription</th>
+            <th>Actions</th>
           </tr>
           {{list:item}}
             <tr class='{$parity}'>
@@ -47,12 +47,12 @@
             </tr>
           {{/list:item}}
           {{list:empty}}
-            <div class="empty_list">Записи отсутствуют</div>
+            <div class="empty_list">Empty</div>
           {{/list:empty}}
         </table>
         <div class='list_actions'>
-          {{apply template="selectors_button" action="set_available" title="В наличии" /}}
-          {{apply template="selectors_button" action="set_unavailable" title="Отсутствуют" /}}
+          {{apply template="selectors_button" action="set_available" title="Set available" /}}
+          {{apply template="selectors_button" action="set_unavailable" title="Set unavailable" /}}
         </div>
       </div>
       {{/list}}

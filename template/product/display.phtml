@@ -1,0 +1,53 @@
+<? $this->title ='Products'; ?>
+{{wrap with="front_page_layout.phtml" into="content_zone"}}
+
+<a href="{{route_url params='controller:product'}}">Display all</a>
+{{list using="$#helper->getAlphabet()"}}
+  {{list:item}}
+    <? if ($this->helper->getCurrentLetter() == $item) { ?>
+    <b>{$item|uppercase}</b>
+    <? } else { ?>
+    <?php $letter_param = AlphabetHelper :: REQUEST_PARAM_NAME; ?>
+    <a href='/product?{$letter_param}={$item}'>{$item|uppercase}</a>
+    <? } ?>
+    {{/list:item}}
+{{/list}}
+
+{{include file='_admin/pager.phtml' items="$#items" per_page="5"/}}
+<br/>
+
+<p><strong>Search the products:</strong></p>
+{{form method="GET" id='search_form' name='search_form' action='product'}}
+  <label for='title'>Product title:</label>
+  {{input type="text" name="title" id="product" size='10'/}}
+
+  <label for='price_greater'>Price greater:</label>
+  {{input type="text" name="price_greater" id="price_greater" type="text" size='4'/}}
+
+  <label for='price_less'>Price less:</label>
+  {{input type="text" name="price_less" id="price_less" type="text" size='4'/}}
+
+  <input type='submit' name='search' value="Search!" class='button'/><br/>
+{{/form}}
+
+{{list using="$#items"}}
+<table cellpadding="0" cellspacing="0" class='list'>
+  {{list:item}}
+  <tr>
+   <td>
+      <dl>
+        <dt>
+          <b>{$item.title}</b><br />
+          Price: <b>${$item.price|number:2, '.', ' '}</b><br/>
+         </dt>
+         <dd>
+            <img src='{$item.image_path}' class='img'/>
+            {$item.description|nl2br}
+         </dd>
+      </dl>
+    </td>
+  </tr>
+  {{/list:item}}
+</table>
+{{/list}}
+{{/wrap}}
