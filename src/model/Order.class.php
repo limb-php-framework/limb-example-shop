@@ -34,4 +34,12 @@ class Order extends lmbActiveRecord
     return $statuses[$this->getStatus()];
   }
 
+  function getStatusOptions()
+  {
+    return array(
+      self :: STATUS_NEW => 'new',
+      self :: STATUS_PROCESSED => 'processed',
+      self :: STATUS_FINISHED => 'finished'
+    );
+  }
 }
