@@ -39,11 +39,12 @@
         <dt>
           <b>{$item.title}</b><br />
           Price: <b>${$item.price|number:2, '.', ' '}</b><br/>
-         </dt>
-         <dd>
-            <img src='{$item.image_path}' class='img'/>
-            {$item.description|nl2br}
-         </dd>
+          <a href="{{route_url params='controller:cart,action:add,id:{$item.id}'}}">Add to cart</a><br/>
+        </dt>
+        <dd>
+          <img src='{$item.image_path}' class='img'/>
+          {$item.description|nl2br}
+        </dd>
       </dl>
     </td>
   </tr>
