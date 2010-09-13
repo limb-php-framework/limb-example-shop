@@ -80,7 +80,7 @@ table.list{border:0px;border-left:solid 1px #d7d6d0; width: 690px;margin-bottom:
 
 .list .left	{border-left:solid 1px #d7d6d0;}
 .list td		{border-right:solid 1px #d7d6d0; padding:10px; height:33px; border-bottom: solid 1px #d7d6d0;vertical-align:top;}
-.list .odd				{background-color:#f8f8f8; }
+.list .odd	{background-color:#d7d6d0;}
 
 .list .top	td			{border-top:solid 1px #d7d6d0;}
 

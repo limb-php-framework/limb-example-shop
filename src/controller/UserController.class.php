@@ -140,4 +140,20 @@ class UserController extends lmbController
     $this->toolkit->getSession()->remove('user_id');
     $this->response->redirect('/');
   }
+
+  function doShowOrder()
+  {
+    try
+    {
+      $order = new Order($this->request->getInteger('id'));
+      if(!$order->belongsToUser($this->toolkit->getUser()))
+        $this->flashAndRedirect('You can see only your orders!', '/');
+      else
+        $this->order = $order;
+    }
+    catch(lmbARException $e)
+    {
+      $this->flashAndRerdirect('Can\'t load order!', '/');
+    }
+  }
 }

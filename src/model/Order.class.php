@@ -45,6 +45,11 @@ class Order extends lmbActiveRecord
     );
   }
 
+  function belongsToUser($user)
+  {
+    return ($this->getUserId() == $user->getId());
+  }
+
   static function findForAdmin($params = array())
   {
     $criteria = new lmbSQLCriteria();
