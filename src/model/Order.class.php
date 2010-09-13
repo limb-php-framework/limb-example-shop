@@ -24,8 +24,10 @@ class Order extends lmbActiveRecord
   function setStatus($value)
   {
     $statuses = $this->getStatusOptions();
-    if(isset($statuses[$value]))
-      $this->_setRaw('status', $value);
+    if(!isset($statuses[$value]))
+      return;
+    $this->_setRaw('status', $value);
+    $this->_markDirtyProperty('status');
   }
 
   function getStatusName()
@@ -41,5 +43,15 @@ class Order extends lmbActiveRecord
       self :: STATUS_PROCESSED => 'processed',
       self :: STATUS_FINISHED => 'finished'
     );
+  }
+
+  static function findForAdmin($params = array())
+  {
+    $criteria = new lmbSQLCriteria();
+
+    if(isset($params['status']))
+      $criteria->add(lmbSQLCriteria::equal('status', $params['status']));
+
+    return Order :: find($criteria);
   }
 }

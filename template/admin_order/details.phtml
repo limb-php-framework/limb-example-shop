@@ -1,0 +1,53 @@
+<? $this->title ='Order #'.$this->order->getId(); ?>
+{{wrap with="admin_modal_page_layout.phtml" in="content_zone"}}
+
+{{form id='status_form' name='status_form' method='post'}}
+  <h1>Order #{$#order.id}</h1>
+
+  <dl class="field">
+    <dt>Items:</dt>
+    <dd>
+    {{list using='$#order.lines' parity='$parity' as='$line'}}
+    <table cellpadding="0" cellspacing="0" class='list'>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Summ</th>
+        </tr>
+      </thead>
+      {{list:item}}
+        <tr class='{$parity}'>
+         <td>{$line.product.title}</td>
+         <td>${$line.price|number:2, '.', ' '}</td>
+         <td>{$line.quantity}</td>
+         <td>${$line.summ|number:2, '.', ' '}</td>
+        </tr>
+      {{/list:item}}
+    </table>
+  {{/list}}
+    </dd>
+  </dl>
+
+  <dl class="field">
+    <dt>Customer:</dt>
+    <dd><a href='mailto:{$#order.user.email}'>{$#order.user.name} ({$#order.user.login})</a></dd>
+  </dl>
+
+  <dl class="field">
+    <dt>Address :</dt>
+    <dd>{$#order.address}</dd>
+  </dl>
+
+	<dl class="field">
+	  <dt>Status :</dt>
+	  <dd><?php $statuses = Order :: getStatusOptions(); ?>
+	    {{select id='status' name='status' options="$statuses"/}}
+	  </dd>
+	</dl>
+
+  {{include file='_admin/form_buttons.phtml'/}}
+
+{{/form}}
+{{/wrap}}

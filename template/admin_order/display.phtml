@@ -1,0 +1,50 @@
+<? $this->title = 'Orders'; ?>
+{{wrap with="admin_page_layout.phtml" in="content_zone"}}
+
+<p>
+{{form method="GET" id='filter_form'}}
+  <?php $statuses = Order :: getStatusOptions(); ?>
+  Filter : {{select id='status' name='status' options="$statuses"}}
+  {{option value='' prepend='true'}}Show all{{/option}}{{/select}}
+  <input type='submit' name='filter' value="Filter" class='button'/><br/>
+{{/form}}
+</p>
+
+{{include file="_admin/selectors.phtml"/}}
+{{include file="_admin_object/actions.phtml"/}}
+
+{{include file='_admin/pager.phtml' items="$#orders"/}}
+
+<div id="body">
+  {{list using="$#orders" parity="$parity"}}
+    <div class='list'>
+      <table>
+        <tr>
+          <th>User</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Summ</th>
+          <th>Action</th>
+        </tr>
+
+        {{list:item}}
+          <tr class="{$parity}">
+            <td>{$item.user.login}</td>
+            <td>{$item.date|date:"d.m.Y H:i"}</td>
+            <td>{$item.status_name}</td>
+            <td>{$item.summ}</td>
+            <td class='actions'>
+              {{apply template="object_action" action="details" title="Details" icon="zoom" item="{$item}"/}}
+              {{apply template="object_action_edit" item="{$item}"/}}
+              {{apply template="object_action_delete" item="{$item}"/}}
+            </td>
+          </tr>
+        {{/list:item}}
+        {{list:empty}}
+          <div class="empty_list">We have no orders yet.</div>
+        {{/list:empty}}
+      </table>
+    </div>
+  {{/list}}
+</div>
+{{/wrap}}
